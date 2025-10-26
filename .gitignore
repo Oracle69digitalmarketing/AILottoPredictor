@@ -1,0 +1,14 @@
+node_modules/
+android/
+ios/build/
+__tests__/
+.DS_Store
+.env
+.vscode/
+.idea/
+
+.amplify/
+.cache/
+.amplify/
+.cache/
+*.zip
