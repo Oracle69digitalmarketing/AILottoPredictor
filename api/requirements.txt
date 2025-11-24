@@ -1,0 +1,4 @@
+Flask
+supabase
+anthropic
+python-dotenv
