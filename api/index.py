@@ -14,7 +14,6 @@ app = Flask(__name__)
 # --- Environment Variables ---
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-# Switched to DeepSeek API Key
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY")
 
 # --- Initialize Clients ---
@@ -42,7 +41,7 @@ def get_prediction():
         with open('api/babaijeburesults.csv', 'r') as f:
             lines = f.read().splitlines()
         reader = csv.DictReader(lines)
-        draws = list(reader)[-10:]
+        draws = list(reader)  # Use the entire dataset
         if not draws:
             return jsonify({"error": "CSV file is empty or has no data."}), 400
     except FileNotFoundError:
@@ -54,9 +53,9 @@ def get_prediction():
         for i, row in enumerate(draws)
     ])
     prompt = f"""
-Here are the last 10 draws of the '{draws[-1]['Game']}' game:
+Here is the historical data for the '{draws[-1]['Game']}' game:
 {formatted_draws}
-Based on this data, what are the 5 most likely numbers to appear in the next draw?
+Based on the entire history, what are the 5 most likely numbers to appear in the next draw?
 Return your answer as a clean JSON object with two keys: "numbers" (a list of 5 integers) and "probabilities" (a dictionary mapping each number as a string to its probability as a float).
 """
 

@@ -16,6 +16,25 @@ The project is divided into two main components:
 -   **AI Model**: It calls the **DeepSeek V3** model (`deepseek-chat`) via their OpenAI-compatible API.
 -   **Data Storage**: Predictions are stored in a PostgreSQL database managed by **Supabase**.
 
+### Keeping the Data Up-to-Date
+
+The accuracy of the AI predictions depends heavily on the quality and completeness of the historical data in `api/babaijeburesults.csv`. To get the best results, you should periodically update this file with the latest lottery draws.
+
+**Manual Update Instructions:**
+
+1.  **Get the Latest Results**: Visit the official [Baba Ijebu results page](https://babaijebu.ng/en/lottery-results).
+2.  **Open the CSV File**: Open the `api/babaijeburesults.csv` file in a text editor or spreadsheet program.
+3.  **Add a New Row**: Add a new line to the end of the file for each new draw, following the existing CSV format:
+    ```csv
+    "Game","Date","Winning Numbers","Machine Numbers"
+    ```
+    -   **Game**: The name of the lottery game (e.g., "Premier").
+    -   **Date**: The date of the draw in `YYYY-MM-DD` format.
+    -   **Winning Numbers**: A comma-separated list of the winning numbers.
+    -   **Machine Numbers**: A comma-separated list of the machine numbers.
+
+4.  **Save and Redeploy**: Save the file and redeploy the application to Vercel to ensure the changes are live.
+
 ## Getting Started
 
 ### Prerequisites
