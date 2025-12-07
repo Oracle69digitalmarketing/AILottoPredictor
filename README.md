@@ -7,13 +7,13 @@ This project is a mobile application that uses an AI-powered backend to predict 
 The project is divided into two main components:
 
 1.  **Frontend**: A React Native application located in the `AILottoPredictorApp` directory. This app is responsible for displaying the lottery predictions to the user.
-2.  **Backend**: A Python serverless function in the `api` directory, designed to be deployed on Vercel. It uses Supabase for data storage and the Anthropic API for AI-powered predictions.
+2.  **Backend**: A Python serverless function in the `api` directory, designed to be deployed on Vercel. It uses Supabase for data storage and the DeepSeek API for AI-powered predictions.
 
 ### Backend Details
 
 -   **Hosting**: The serverless function is deployed on **Vercel**.
 -   **Data Source**: It reads historical lottery results from a local CSV file (`babaijeburesults.csv`) included in the `api` directory.
--   **AI Model**: It calls the **Anthropic Claude 3 Sonnet** model directly via their API.
+-   **AI Model**: It calls the **DeepSeek V3** model (`deepseek-chat`) via their OpenAI-compatible API.
 -   **Data Storage**: Predictions are stored in a PostgreSQL database managed by **Supabase**.
 
 ## Getting Started
@@ -24,7 +24,7 @@ The project is divided into two main components:
 -   **React Native development environment**: See the [official guide](https://reactnative.dev/docs/set-up-your-environment).
 -   **Vercel Account**: To deploy the backend.
 -   **Supabase Account**: To create the database.
--   **Anthropic Account**: To get an API key for the AI model.
+-   **DeepSeek Account**: To get an API key for the AI model.
 
 ---
 
@@ -46,10 +46,10 @@ The project is divided into two main components:
     ```
 3.  Go to **Project Settings > API**. Find your **Project URL** and your **`service_role` Key**. You will need these for the environment variables.
 
-**Step 2: Get an Anthropic API Key**
+**Step 2: Get a DeepSeek API Key**
 
-1.  Go to [Anthropic](https://www.anthropic.com/) and create an account.
-2.  Navigate to your account settings and generate a new API key.
+1.  Go to the [DeepSeek API Platform](https://platform.deepseek.com/) and create an account.
+2.  Navigate to the API keys section and generate a new API key.
 
 **Step 3: Deploy to Vercel**
 
@@ -58,7 +58,7 @@ The project is divided into two main components:
 3.  During the project setup, configure the following **Environment Variables**:
     -   `SUPABASE_URL`: The Project URL you got from Supabase.
     -   `SUPABASE_KEY`: The `service_role` key you got from Supabase.
-    -   `ANTHROPIC_API_KEY`: The API key you got from Anthropic.
+    -   `DEEPSEEK_API_KEY`: The API key you got from DeepSeek.
 4.  Vercel will automatically detect the `vercel.json` file and deploy the serverless function. Once deployed, you will get a production URL.
 
 ---
