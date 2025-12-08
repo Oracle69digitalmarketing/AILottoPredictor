@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import axios from 'axios';
-
-// TODO: Replace this with your actual API Gateway endpoint URL.
-const API_URL = 'https://placeholder.execute-api.us-east-1.amazonaws.com/prod/predictions';
+import { API_URL } from '@env';
 
 interface PredictionResponse {
   numbers: number[];
