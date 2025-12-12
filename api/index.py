@@ -24,6 +24,9 @@ except Exception as e:
     supabase = None
 
 try:
+    client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url=DEEPSEEK_API_BASE)
+except Exception as e:
+    print(f"Error initializing OpenAI client: {e}")
     client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com/v1")
 except Exception as e:
     print(f"Error initializing OpenAI client for DeepSeek: {e}")
@@ -49,10 +52,18 @@ def get_prediction():
     prompt = f"""
 Here is the historical data for the '{draws[-1]['Game']}' game:
 {formatted_draws}
-Based on the entire history, what are the 5 most likely numbers to appear in the next draw?
-Return your answer as a clean JSON object with two keys: "numbers" (a list of 5 integers) and "probabilities" (a dictionary mapping each number as a string to its probability as a float).
-"""
-
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that only responds in valid JSON."},
+                {"role": "user", "content": prompt},
+            ],
+            stream=False,
+            temperature=0.7,
+            max_tokens=500,
+            response_format={"type": "json_object"},
+        )
+        predictions = json.loads(response.choices[0].message.content)
     try:
         response = client.chat.completions.create(
             model="deepseek-chat",
