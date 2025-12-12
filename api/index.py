@@ -52,24 +52,18 @@ def get_prediction():
     prompt = f"""
 Here is the historical data for the '{draws[-1]['Game']}' game:
 {formatted_draws}
-Based on the entire history, what are the 5 most likely numbers to appear in the next draw?
-Return your answer as a clean JSON object with two keys: "numbers" (a list of 5 integers) and "probabilities" (a dictionary mapping each number as a string to its probability as a float).
-"""
-
-    # 3. Invoke the Deepseek AI model
-    try:
         response = client.chat.completions.create(
             model="deepseek-chat",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "system", "content": "You are a helpful assistant that only responds in valid JSON."},
                 {"role": "user", "content": prompt},
             ],
-            stream=False
+            stream=False,
+            temperature=0.7,
+            max_tokens=500,
+            response_format={"type": "json_object"},
         )
-        predictions_text = response.choices[0].message.content
-        # Clean the response to ensure it's valid JSON
-        predictions_json = predictions_text[predictions_text.find('{'):predictions_text.rfind('}')+1]
-        predictions = json.loads(predictions_json)
+        predictions = json.loads(response.choices[0].message.content)
     try:
         response = client.chat.completions.create(
             model="deepseek-chat",
