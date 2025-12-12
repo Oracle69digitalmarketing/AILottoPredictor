@@ -27,6 +27,9 @@ try:
     client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
 except Exception as e:
     print(f"Error initializing OpenAI client: {e}")
+    client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com/v1")
+except Exception as e:
+    print(f"Error initializing OpenAI client for DeepSeek: {e}")
     client = None
 
 # --- Main Prediction Route ---
@@ -35,26 +38,21 @@ def get_prediction():
     if not supabase or not client:
         return jsonify({"error": "Backend services not configured properly."}), 500
 
-    # 1. Read local CSV data
     try:
         with open('api/babaijeburesults.csv', 'r') as f:
             lines = f.read().splitlines()
         reader = csv.DictReader(lines)
-        draws = list(reader)[-10:]
+        draws = list(reader)
         if not draws:
             return jsonify({"error": "CSV file is empty or has no data."}), 400
     except FileNotFoundError:
-        return jsonify({"error": "Data file not found."}), 404
+        return jsonify({"error": "Data file not found. Please ensure `api/babaijeburesults.csv` exists."}), 404
 
-    # 2. Format data and create a prompt for the AI model
-    formatted_draws = "\n".join([
-        f"{i+1}. {row['Date']}: {row['Winning Numbers']}"
-        for i, row in enumerate(draws)
-    ])
+    formatted_draws = "\n".join([f"{i+1}. {row['Date']}: {row['Winning Numbers']}" for i, row in enumerate(draws)])
     prompt = f"""
-Here are the last 10 draws of the '{draws[-1]['Game']}' game:
+Here is the historical data for the '{draws[-1]['Game']}' game:
 {formatted_draws}
-Based on this data, what are the 5 most likely numbers to appear in the next draw?
+Based on the entire history, what are the 5 most likely numbers to appear in the next draw?
 Return your answer as a clean JSON object with two keys: "numbers" (a list of 5 integers) and "probabilities" (a dictionary mapping each number as a string to its probability as a float).
 """
 
@@ -72,27 +70,31 @@ Return your answer as a clean JSON object with two keys: "numbers" (a list of 5 
         # Clean the response to ensure it's valid JSON
         predictions_json = predictions_text[predictions_text.find('{'):predictions_text.rfind('}')+1]
         predictions = json.loads(predictions_json)
+    try:
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=500,
+            temperature=0.7,
+            response_format={"type": "json_object"}
+        )
+        predictions_text = response.choices[0].message.content
+        predictions = json.loads(predictions_text)
     except Exception as e:
         return jsonify({"error": f"Error invoking model or processing response: {str(e)}"}), 500
 
-    # 4. Store predictions to Supabase
     try:
         game_name = draws[-1]['Game']
         prediction_date = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-
-        # Ensure probabilities are stored in a format Supabase can handle (e.g., JSONB)
         probabilities_for_db = {str(k): float(v) for k, v in predictions['probabilities'].items()}
-
-        data, count = supabase.table('LottoPredictions').insert({
+        supabase.table('LottoPredictions').insert({
             'GameName': game_name,
             'PredictionDate': prediction_date,
             'TopNumbers': predictions['numbers'],
             'Probabilities': probabilities_for_db,
-            'ModelVersion': 'Deepseek Chat (Deepseek API)'
+            'ModelVersion': 'DeepSeek V3 (deepseek-chat)'
         }).execute()
-
     except Exception as e:
-        # Log the error but don't fail the request if the DB insert fails
         print(f"Error storing prediction to Supabase: {str(e)}")
 
     return jsonify(predictions)
