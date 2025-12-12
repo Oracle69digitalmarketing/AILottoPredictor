@@ -24,7 +24,7 @@ except Exception as e:
     supabase = None
 
 try:
-    client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
+    client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url=DEEPSEEK_API_BASE)
 except Exception as e:
     print(f"Error initializing OpenAI client: {e}")
     client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com/v1")
