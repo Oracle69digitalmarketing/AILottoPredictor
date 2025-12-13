@@ -12,3 +12,4 @@ __tests__/
 .amplify/
 .cache/
 *.zip
+*.log
