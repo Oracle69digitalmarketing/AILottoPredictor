@@ -1,4 +1,4 @@
 Flask
 supabase
-anthropic
+openai
 python-dotenv
