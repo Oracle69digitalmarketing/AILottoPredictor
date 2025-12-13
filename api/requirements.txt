@@ -1,4 +1,4 @@
 Flask
 supabase
-python-dotenv
 openai
+python-dotenv
